@@ -1,9 +1,11 @@
+import request from 'supertest';
+import app from '../../../app';
 import createConnection from "../../../database";
 import UserRepository from "../../../repositories/User";
 import CreateUserService from "./CreateUserService";
 import { clearDB } from '../../../utils';
 
-describe("Create User Service", () => {
+describe("Create User Controller", () => {
   let userRepository: UserRepository;
   let createUserService: CreateUserService;
 
@@ -20,26 +22,29 @@ describe("Create User Service", () => {
 
   it("should be able to create a new user", async () => {
     const params: UserType.Create = {
-      name: "Unit Test",
-      username: "unit_test",
-      email: "unit@test.com",
+      name: "integration Test",
+      username: "integration_test",
+      email: "integration@test.com",
     };
 
-    const user = await createUserService.execute(params);
+    const {status, body} = await request(app).post('/create').send(params)
 
-    expect(user).toHaveProperty("id");
-    expect(user.username).toBe("unit_test");
+    expect(status).toBe(200);
+
+    expect(body).toHaveProperty("id");
+    expect(body).toHaveProperty("created_at");
   });
 
   it("should not be able to create a new user", async () => {
     const params: UserType.Create = {
-      name: "unit Test exist",
-      username: "unit_test",
-      email: "unit_existg@jest.com",
+      name: "integration Test exist",
+      username: "integration_test",
+      email: "integration_exist@test.com",
     };
 
-    expect(async () => await createUserService.execute(params)).rejects.toThrow(
-      "User Already Exists"
-    );
+    const {status, body} = await request(app).post('/create').send(params)
+
+    expect(status).toBe(400);
+    expect(body.error).toEqual('User Already Exists');
   });
 });
