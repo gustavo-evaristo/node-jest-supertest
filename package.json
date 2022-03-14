@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node build/server.js",
     "dev": "ts-node-dev -T -I node_modules src/server.ts",
-    "test": "jest --coverage",
+    "test": "jest --coverage --detectOpenHandles",
     "typeorm": "ts-node -T -I node_modules ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
