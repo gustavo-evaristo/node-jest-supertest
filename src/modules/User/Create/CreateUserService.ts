@@ -6,10 +6,8 @@ export default class CreateUserService {
 
   async execute({name, username, email}: UserType.Create): Promise<Users> {
 
-    if (await this.userRepository.exists(username)) {
-      throw new Error('User Already Exists');
-    }
-
+    if (await this.userRepository.exists(username)) throw new Error('User Already Exists');
+  
     const user = this.userRepository.create({ name, username, email});
 
     return user;
