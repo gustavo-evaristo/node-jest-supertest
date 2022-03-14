@@ -1,26 +1,50 @@
-import 'reflect-metadata';
-import './database';
+import "reflect-metadata";
 import "express-async-errors";
-import express, { Request, Response, NextFunction} from 'express';
-import routes from './routes';
+import createConnection from "./database";
+import express, { Application, Request, Response, NextFunction } from "express";
+import routes from "./routes";
 
-const app = express();
+class App {
+  public express: Application;
 
-app.use(express.json());
+  public constructor() {
+    this.express = express();
 
-app.use(routes);
+    this.database();
 
-app.use(
-    (err: Error, request: Request, response: Response, next: NextFunction) => {
-      if (err instanceof Error) {
-        return response.status(400).json({
-          error: err.message,
+    this.middlewares();
+
+    this.routes();
+  }
+
+  private database(): void {
+    createConnection();
+  }
+
+  private middlewares(): void {
+    this.express.use(express.json());
+  }
+
+  private routes(): void {
+    this.express.use(routes);
+    this.express.use(
+      (
+        err: Error,
+        request: Request,
+        response: Response,
+        next: NextFunction
+      ) => {
+        if (err instanceof Error) {
+          return response.status(400).json({
+            error: err.message,
+          });
+        }
+        return response.status(500).json({
+          error: `Internal server error - ${err}`,
         });
       }
-      return response.status(500).json({
-        error: `Internal server error - ${err}`,
-      });
-    }
-  );
+    );
+  }
+}
 
-export default app;
+export default new App().express;

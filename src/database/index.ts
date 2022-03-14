@@ -1,8 +1,7 @@
-import {createConnection} from 'typeorm';
+import { createConnection, Connection, getConnectionOptions } from 'typeorm';
 
-try {
-    createConnection();
-    console.log('database connected');
-} catch (err) {
-    console.log(err);
+export default async (): Promise<Connection> => {
+	const defaultOptions = await getConnectionOptions()
+
+	return createConnection(defaultOptions);
 }
